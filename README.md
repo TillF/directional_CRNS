@@ -1,23 +1,14 @@
-# scanning_CRNS
-R-package for theoretical studies on directional Cosmic-ray-neutron-sensing -measurements (scanning CRNS).
+# directional_CRNS
+## Illustrate theoretical discernability and accuracy of CRNS signal of a directional CRNS probe
+Scripts for generating the figures of the manuscript
+"Assessing the feasibility of a directional CRNS-sensor for estimating soil moisture"
+by Till Francke, Maik Heistermann, Markus Köhli, Christian Budach, Martin Schrön, Sascha E. Oswald
 
-## INSTALLATION
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/HEAD)
 
-* command line installation:
+## 3. Run `hello.R`
 
-```R
-install.packages("devtools") 
-library(devtools)
-install_github("TillF/scanning_CRNS")
-```
+**TO DO:** :vertical_traffic_light:
 
-* from zip/tar:
-	* download zip/tar from github: [>LINK<](https://github.com/TillF/scanning_CRNS/releases)
-	* install via R-GUI
-
-
-## FEEDBACK and BUGS
-
-Feel free to comment via github issues: [>LINK<](https://github.com/TillF/scanning_CRNS/issues)
-
-
+1. In the top right corner, click "New" :arrow_right: "Rstudio"
+2. In the console (the left-side panel) in Rstudio, type `source("hello.R")` and press return

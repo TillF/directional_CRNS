@@ -257,8 +257,7 @@ source("R/compute_ci_p.R")
 # A1 simulate theoretical distributions for a range of settings: R vs. t_min (CI-thresh) ####
   # requires functions p_value_two_sided() and compute_ci_p2()
   
-  #library(scanningCRNS)
-  
+
 delta_ts_fine = exp(seq(from=log(0.5), to=log(30), length.out=100))  #aggregation intervals to test [h]
 
 
@@ -308,8 +307,7 @@ for (i in 1:length(contrasts_coarse))
 
 # A2 simulate theoretical distributions for a range of settings: R vs. t_min (p-thresh) ####
  # requires functions p_value_two_sided() and compute_ci_p2()
-library(scanningCRNS)
-  
+
 #delta_ts_fine = exp(seq(from=log(0.5), to=log(30), length.out=100))  #aggregation intervals to test [h]
 
 
