@@ -6,6 +6,9 @@ by Till Francke, Maik Heistermann, Markus K√∂hli, Christian Budach, Martin Schr√
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/HEAD)
 
+Jupyter+R: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/HEAD?filepath=empty_R.ipynb)
+RStudio: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/HEAD?urlpath=rstudio)
+
 ## 3. Run `hello.R`
 
 **TO DO:** :vertical_traffic_light:
