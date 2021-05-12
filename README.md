@@ -4,10 +4,14 @@ Scripts for generating the figures of the manuscript
 "Assessing the feasibility of a directional CRNS-sensor for estimating soil moisture"
 by Till Francke, Maik Heistermann, Markus Köhli, Christian Budach, Martin Schrön, Sascha E. Oswald
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/HEAD)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main)
 
-Jupyter+R: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/HEAD?filepath=empty_R.ipynb)
-RStudio: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/HEAD?urlpath=rstudio)
+Jupyter+R: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?filepath=empty_R.ipynb)
+
+RStudio: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?urlpath=rstudio)
+
+RStudio+Conda: [![Binder](http://mybinder.org/badge_logo.svg)](http://mybinder.org/v2/gh/TillF/directional_CRNS/main?urlpath=rstudio)
+
 
 ## 3. Run `hello.R`
 
