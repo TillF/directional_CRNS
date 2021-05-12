@@ -3,6 +3,13 @@
 # "Assessing the feasibility of a directional CRNS-sensor for estimating soil moisture"
 # by Till Francke, Maik Heistermann, Markus Köhli, Christian Budach, Martin Schrön, Sascha E. Oswald
 
+# prepare deployment via Binder (online instance to be run directly from Github)
+# remotes::install_github("karthik/holepunch")
+# holepunch::write_runtime() 
+# holepunch::write_dockerfile(maintainer = "your_name")  #needed?
+# holepunch::write_install()
+# holepunch::generate_badge() # This generates a badge for your readme.
+
 # set the scenario of interest here:
   scenario="optimistic" #"optimistic" or "pessimistic"
   #scenario="pessimistic" #"optimistic" or "pessimistic"

@@ -10,7 +10,11 @@ Jupyter+R: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/
 
 RStudio: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?urlpath=rstudio)
 
-RStudio+Conda: [![Binder](http://mybinder.org/badge_logo.svg)](http://mybinder.org/v2/gh/TillF/directional_CRNS/main?urlpath=rstudio)
+RStudio+Conda: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?urlpath=rstudio)
+
+<!-- badges: start -->
+[![Launch Rstudio Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/master?urlpath=rstudio)
+<!-- badges: end -->
 
 
 ## 3. Run `hello.R`
