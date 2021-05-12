@@ -8,13 +8,13 @@ For online demonstration, please start an instance on Binder with or without RSt
 
 For local use, please download or clone this repository.
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main)
+Pure R: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main)
 
 Jupyter+R: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?filepath=empty_R.ipynb)
 
-RStudio: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?urlpath=rstudio)
+RStudio:       [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?urlpath=rstudio)
 
-RStudio+Conda: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?urlpath=rstudio)
+
 
 
 ## 3. Run `hello.R`
