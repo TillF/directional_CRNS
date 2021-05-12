@@ -1,8 +1,12 @@
 # directional_CRNS
-## Illustrate theoretical discernability and accuracy of CRNS signal of a directional CRNS probe
+## Discernability and accuracy of CRNS signal from a directional CRNS probe
 Scripts for generating the figures of the manuscript
 "Assessing the feasibility of a directional CRNS-sensor for estimating soil moisture"
 by Till Francke, Maik Heistermann, Markus Köhli, Christian Budach, Martin Schrön, Sascha E. Oswald
+
+For online demonstration, please start an instance on Binder with or without RStudio.
+
+For local use, please download or clone this repository.
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main)
 
@@ -11,10 +15,6 @@ Jupyter+R: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/
 RStudio: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?urlpath=rstudio)
 
 RStudio+Conda: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?urlpath=rstudio)
-
-<!-- badges: start -->
-[![Launch Rstudio Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/master?urlpath=rstudio)
-<!-- badges: end -->
 
 
 ## 3. Run `hello.R`

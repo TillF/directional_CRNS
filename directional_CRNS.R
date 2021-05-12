@@ -8,7 +8,7 @@
 # holepunch::write_runtime() 
 # holepunch::write_dockerfile(maintainer = "your_name")  #needed?
 # holepunch::write_install()
-# holepunch::generate_badge() # This generates a badge for your readme.
+# holepunch::generate_badge() # This generates a badge for your readme.md -> may need replacin "master" with "main"
 
 # set the scenario of interest here:
   scenario="optimistic" #"optimistic" or "pessimistic"
