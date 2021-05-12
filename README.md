@@ -8,7 +8,7 @@ For online demonstration, please start an instance on Binder with or without RSt
 
 For local use, please download or clone this repository.
 
-Pure R: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main)
+empty Binder: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main)
 
 Jupyter+R: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?filepath=empty_R.ipynb)
 
