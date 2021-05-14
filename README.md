@@ -9,7 +9,7 @@ For local use, please download or clone this repository.
 
 For online demonstration, please start an instance on Binder:
 
-* Jupyter-notbook R: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?filepath=empty_R.ipynb)
+* Jupyter-notbook R: [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?filepath=run_demo.ipynb)
 
 * RStudio (open "directional_CRNS.R" and execute):       [![Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TillF/directional_CRNS/main?urlpath=rstudio)
 
