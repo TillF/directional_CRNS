@@ -1,22 +1,21 @@
 ---
 title: "Directional CRNS measurements"
-output: crns_notebook
+output: html_notebook
 ---
 
 # Illustrate theoretical discernability and accuracy of CRNS signal of a directional CRNS probe
-# scripts for generating the figures of the manuscript
-# "Assessing the feasibility of a directional CRNS-sensor for estimating soil moisture"
-# by Till Francke, Maik Heistermann, Markus Köhli, Christian Budach, Martin Schrön, Sascha E. Oswald
+Scripts for generating the figures of the manuscript
+"Assessing the feasibility of a directional CRNS-sensor for estimating soil moisture"
+by Till Francke, Maik Heistermann, Markus Köhli, Christian Budach, Martin Schrön, Sascha E. Oswald
 
-```{r, echo=FALSE}
+## 0. parameters ####
+This chunk contains the parameters of the simulation, or lets you choose the pre-definded scenarios "optimistic" and "pessimistic".
+
+```{r, include=FALSE}
 # set the scenario of interest here:
 scenario="optimistic" #"optimistic" or "pessimistic"
 #scenario="pessimistic" #"optimistic" or "pessimistic"
 
-```
-
-# parameters ####
-```{r, echo=FALSE}
 library(latex2exp)
 
 R_1  = 2100 #base count rate of area_1 [counts per hour]
@@ -114,9 +113,8 @@ optimize(interval = range(contrasts_coarse), difference_to_threshold_p, delta_t=
 #g) min contrast interval resolvable for 24 h resolution
 optimize(interval = range(contrasts_coarse), difference_to_threshold_p, delta_t=24,                    R_1=R_1, B=B, Bi=Bi, target_comparison="N_1r_t.N_2r_t", p_thresh=p_thresh)
 
-
 ```
-# 1 simulate theoretical distributions, considering sample uncertainty, function, for a single setting ####
+## 1. simulate  for a single setting ####
 ```{r, echo=FALSE}
 
 res2 = t(sapply(X=delta_ts_fine, FUN=compute_ci_p2, R_1=R_1, R_2=R_2, B=B, Bi=Bi, eps=eps))
@@ -142,7 +140,7 @@ p_value_comp    = res2[, !(dimnames(res2)[[2]] %in% ci_cols)]
 
 ```
 
-# 1a plot counts and CIs (fig. 7 / ci_example) ####
+## 1.1 plot counts and CIs (fig. 7 / ci_example) ####
 ```{r, echo=FALSE}
 
 if (save_plots) x11()
@@ -227,8 +225,9 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("ci_examp_", scenario,".pdf"), type = "pdf")
 
 ```
+Example for 95 \%-confidence intervals for the count rates obtained within the half-spaces (${R}_\text{1,total}$ = 2100 counts/h, ${R}_\text{2,total}$ = 2520 counts/h, "optimistic scenario", moderate contrast $\Delta R=0.2$), by the directional CRNS-sensors (${R}_\text{f1,total}$, ${R}_\text{f2,total}$) and the rates reconstructed from the directional sensors (${R}_\text{1r,total}$, ${R}_\text{2r, total}$). The vertical arrows indicate the minimum required aggregation time to confine the CI within 5 \% of the true value ($\Delta t_\text{min}^{\text{determ}}$).
 
-# 1b p-values of comparison (fig. 8 / p_example)####
+## 1.2 p-values of comparison (fig. 8 / p_example)####
 ```{r, echo=FALSE}
 
 if (save_plots) x11()
@@ -280,8 +279,10 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("p_value_examp_", scenario,".pdf"), type = "pdf")
 
 ```
+p-values for discriminating pairs of measured count rates (${R}_\text {1,total}$ = 2100 counts/h, ${R}_\text {2,total}$ = 2520  counts/h, "optimistic scenario", moderate contrast $\Delta R=0.2$). The vertical arrows indicate the minimum required aggregation time $\Delta t_\text{min}^{\text{disting}}$ to statistically \emph{distinguish} two rates at p = 0.05.
 
-# A1 simulate theoretical distributions for a range of settings: R vs. t_min (CI-thresh) ####
+# Simulations for a range of settings 
+## 2.1 simulate  for a range of settings: R vs. t_min (CI-thresh) ####
 ```{r, echo=FALSE}
 
 # requires functions p_value_two_sided() and compute_ci_p2()
@@ -311,7 +312,7 @@ for (i in 1:length(contrasts_coarse))
 
 ```
 
-# A1 plot results ####
+## 2.1 plot results (fig. 9) ####
 ```{r, echo=FALSE}
 
 library(RColorBrewer)
@@ -338,8 +339,9 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("A1_CI_R_vs_aggrtime_", scenario,".pdf"), type = "pdf")
 
 ```
+Minimum aggregation time $\Delta t_\text{min}^{\text{determ}}$ required to obtain the reconstructed epithermal count rate ${R}_\text{1r,\text{epi}}$ from the two directional measurements with a CI smaller than 5 \% of the actual value. Left: "optimistic" scenario ($\epsilon$ = 0; $\eta$ = 0.72); right:  "pessimistic" scenario ($\epsilon$ = 0.3; $\eta$ = 0.61)
 
-# A2 simulate theoretical distributions for a range of settings: R vs. t_min (p-thresh) ####
+## 2.2 simulate  for a range of settings: R vs. t_min (p-thresh) ####
 ```{r, echo=FALSE}
 
 # requires functions p_value_two_sided() and compute_ci_p2()
@@ -371,7 +373,7 @@ for (i in 1:length(contrasts_coarse))
 
 ```
 
-# A2 plot results ####
+## 2.2 plot results (fig. 10) ####
 ```{r, echo=FALSE}
 
 library(RColorBrewer)
@@ -396,8 +398,9 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("A2_p_R_vs_aggrtime_", scenario,".pdf"), type = "pdf")
 
 ```
+Minimum aggregation time $\Delta t_\text{min}^{\text{disting}}$ required to statistically separate the reconstructed count rates  ${R}_\text{1r}$ and ${R}_\text{2r}$ from the two directional measurements with p-value < 0.05.
 
-# B1 simulate theoretical distributions for a range of settings: R vs. contrasts (CI-thresh) ####
+## 3.1 simulate  for a range of settings: R vs. contrasts (CI-thresh) ####
 ```{r, echo=FALSE}
 
 # requires functions p_value_two_sided() and compute_ci_p2()
@@ -434,7 +437,7 @@ for (i in 1:length(delta_ts_coarse))
 
 ```
 
-# B1 plot results ####
+## 3.1 plot results (fig. 11)####
 ```{r, echo=FALSE}
 
 library(RColorBrewer)
@@ -463,8 +466,9 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("B1_ci_R_vs_contrast_", scenario,".pdf"), type = "pdf")
 
 ```
+Maximum possible contrast $\Delta_R$ in reconstructing the count rates ${R}_\text{1r}$ from the two directional measurements with a CI smaller than 5 \% of the true value.
 
-# B2 simulate theoretical distributions for a range of settings: R vs. contrasts (p-thresh) ####
+## 3.2 simulate  for a range of settings: R vs. contrasts (p-thresh) ####
 ```{r, echo=FALSE}
 
 # requires functions p_value_two_sided() and compute_ci_p()
@@ -499,7 +503,7 @@ for (i in 1:length(delta_ts_coarse))
 
 ```
 
-# B2 plot results ####
+## 3.2 plot results (fig. 12)####
 ```{r, echo=FALSE}
 
 library(RColorBrewer)
@@ -527,8 +531,9 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
 
 
 ```
+Minimum contrast $\Delta_R$ required to statistically separate the reconstructed count rates  ${R}_\text{1r}$ and ${R}_\text{2r}$ from the two directional measurements with p-value < 0.05.
 
-# C1 simulate theoretical distributions for a range of settings: aggr_time vs. contrasts (CI-thresh) ####
+## 4.1 simulate  for a range of settings: aggr_time vs. contrasts (CI-thresh) ####
 ```{r, echo=FALSE}
 
 # requires functions p_value_two_sided() and compute_ci_p2()
@@ -567,7 +572,7 @@ for (i in 1:length(R_coarse))
 
 ```
 
-# C1 plot results ####
+## 4.1 plot results (fig. 13)####
 ```{r, echo=FALSE}
 
 library(RColorBrewer)
@@ -597,8 +602,9 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("C1_ci_aggrtime_vs_contrast_", scenario,".pdf"), type = "pdf")
 
 ```
+Maximum possible contrast $\Delta_R$ to allow the reconstruction of the count rate ${R}_\text{1r}$ from the two directional measurements with a CI smaller than 5 \% of the true value with the aggregation time $\Delta t$.
 
-# C2 simulate theoretical distributions for a range of settings: R vs. contrasts (p-thresh) ####
+## 4.2 simulate  for a range of settings: R vs. contrasts (p-thresh) ####
 ```{r, echo=FALSE}
 
 # requires functions p_value_two_sided() and compute_ci_p()
@@ -633,7 +639,7 @@ optimize(interval = c(1,100000), difference_to_threshold_p, delta_t=1, contrast=
 
 ```
 
-# C2 plot results ####
+## 4.2 plot results (fig. 14)####
 ```{r, echo=FALSE}
 
 library(RColorBrewer)
@@ -665,3 +671,4 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
 # /home/till/.local/bin/jupytext --to notebook directional_CRNS_demo.Rmd
 
 ```
+Minimum contrast $\Delta {R}$ required to statistically separate the  count rates  ${R}_\text{1r}$ and ${R}_\text{2r}$ reconstructed from the two directional measurements with a p-value < 0.05.
