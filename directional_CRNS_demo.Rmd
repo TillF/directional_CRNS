@@ -119,13 +119,8 @@ optimize(interval = range(contrasts_coarse), difference_to_threshold_p, delta_t=
 
 res2 = t(sapply(X=delta_ts_fine, FUN=compute_ci_p2, R_1=R_1, R_2=R_2, B=B, Bi=Bi, eps=eps))
 
-#res3 = t(sapply(X=3.5, FUN=compute_ci_p2, R_1=R_1, R_2=R_2, B=B, Bi=Bi, eps=eps))
-#compute_ci_p2(delta_t = 3.5, R_1=R_1, R_2=R_2, B=B, Bi=Bi, eps=eps)
-#sqrt(R_1 * (1-eps) * 3.5)
-
 #convert to match conventions of plotting routine
 tt = c(R_1, R_2, c(R_1, R_2) %*% B) #all four count rates
-#R = t(array(data=tt, c(4, length(delta_ts_fine)), dimnames = list(c("R_1", "R_2", "R_f1", "R_f2"), NULL))) #count rates [counts per hour]
 R = t(array(data=tt, dimnames = list(c("R_1", "R_2", "R_f1", "R_f2")))) #count rates [counts per hour]
 R = c( R, R * (1-eps)) #these are the total ("_t") and epithermal ("_epi") rates
 names(R) = paste0(c("R_1", "R_2", "R_f1", "R_f2"), c(rep("_t",4), rep("_epi",4)))
@@ -155,9 +150,7 @@ palette(brewer.pal(n=n, "Dark2"))
 #ncols2plot = NCOL(ci_lohi)
 
 #plot CI as lines
-#cols2plot =  c("R_1_epi", "R_2_epi", "R_f1_epi", "R_f2_epi",  "R_1r_epi",  "R_2r_epi") #columns containing the "_epi" values
-#cols2plot =  grep(dimnames(ci_lohi)[[2]], pattern = "_t$", value = TRUE) #columns containing the "_t" (total) values
-cols2plot =  c("R_1_t", "R_2_t", "R_f1_t", "R_f2_t",  "R_1r_t",  "R_2r_t") #columns containing the "_t" values
+cols2plot =  c("R_1_t", "R_2_t", "R_f1_t", "R_f2_t",  "R_1r_t",  "R_2r_t") #columns containing the "_t" (total) values
 
 ncols2plot = length(cols2plot)
 
@@ -193,13 +186,7 @@ for (i in 1:ncols2plot) #plot envelopes for increased visibility
 palette(org_cols)
 
 ci_range = apply(ci_lohi[, cols2plot,], MAR=c(1,2), diff)   
-# head(ci_range / R[ref_cols])
-# (R["R_f1_epi"] - ci_lohi[1, "R_f1_epi","lo"]) / R["R_f1_epi"] #ok
-# (R["R_f2_epi"] - ci_lohi[1, "R_f2_epi","lo"]) / R["R_f2_epi"]
-# 
-# (ci_lohi[1, "R_f1_epi","hi"] - ci_lohi[1, "R_f1_epi","lo"]) / R["R_f1_epi"] #
-# (ci_lohi[1, "R_f2_epi","hi"] - ci_lohi[1, "R_f2_epi","lo"]) / R["R_f2_epi"] # ok
-# head(t(t(ci_range) / R[ref_cols]))
+
 ref_cols = sub(cols2plot, pattern = "(\\d)r_", repl="\\1_") #the columns containing the respective count rates
 
 within_precision = t(t(ci_range) / R[ref_cols]) <= precision #check, where the CI is smaller than the chosen precision
@@ -233,12 +220,11 @@ Example for 95 \%-confidence intervals for the count rates obtained within the h
 if (save_plots) x11()
 par(cex=1.2)
 #cols2plot =  dimnames(p_value_comp)[[2]]
-#cols2plot = c("N_1_epi.N_2_epi", "N_1r_epi.N_2r_epi", "N_f1_epi.N_f2_epi") #, "N_f1_t.N_f2_t"
 cols2plot = c("N_1_t.N_2_t", "N_1r_t.N_2r_t", "N_f1_t.N_f2_t") #, "N_f1_t.N_f2_t"
 
 ncols2plot = length(cols2plot)
 #ylims = range(p_value_comp[-(1:5), cols2plot]) 
-#ylims = c(1800, 2500)
+ylims=c(0, 0.1)
 
 library(RColorBrewer)
 palette(brewer.pal(n=ncols2plot, "Dark2")) #construct palette
@@ -248,7 +234,7 @@ ix_min_below_thresh = apply(p_value_comp, MAR=2, FUN=function(x){which(x <= p_th
 delta_t_subs = 1:min(max(ix_min_below_thresh, length(delta_ts_fine)/2), length(delta_ts_fine))
 
 matplot(delta_ts_fine, y= p_value_comp[, cols2plot], type="l",
-        ylim=c(0, 0.1), xlim=range(delta_ts_fine[delta_t_subs]), ylab = "p-value of comparison [-]", xlab=expression(paste("aggregation time ", Delta, "t [h]")),
+        ylim=ylims, xlim=range(delta_ts_fine[delta_t_subs]), ylab = "p-value of comparison [-]", xlab=expression(paste("aggregation time ", Delta, "t [h]")),
         col=1:ncols2plot, lty=1, lwd=2, log="x")
 abline(h=p_thresh, lty="dashed")
 
