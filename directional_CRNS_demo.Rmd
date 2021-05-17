@@ -9,7 +9,7 @@ Scripts for generating the figures of the manuscript
 by Till Francke, Maik Heistermann, Markus Köhli, Christian Budach, Martin Schrön, Sascha E. Oswald
 
 ## 0. parameters ####
-This chunk contains the parameters of the simulation, or lets you choose the pre-definded scenarios "optimistic" and "pessimistic".
+This chunk contains the parameters of the simulation, or lets you choose the pre-defined scenarios "optimistic" and "pessimistic".
 
 ```{r, include=FALSE}
 # set the scenario of interest here:
