@@ -83,7 +83,7 @@ delta_ts_fine = exp(seq(from=log(min(delta_ts_coarse)), to=log(max(delta_ts_coar
 contrasts_coarse = c(.2, .5, .8, 1.4 )
 contrasts_fine = exp(seq(from=log(min(contrasts_coarse)), to=log(max(contrasts_coarse)), length.out=100))  #contrasts to test [-]
 
-save_plots = FALSE #enable/disable saving PDFs (must be disabled to run in mybinder)                    
+save_plots = TRUE #enable/disable saving PDFs (must be disabled to run in mybinder)                    
 
 #wrapper for savePlot to handle saving plots under different circumstances
 savePlot2 = function(...)
@@ -199,7 +199,7 @@ for (i in 1:ncols2plot) #plot lines denoting minimum aggregation interval
   #points(xplot,  R[i], col=i, pch=25, crt=180 ) 
   points(xplot,  ylims[1], col=i, pch=25, bg=i) #plot marker at x-axis
 }          
-
+axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("R_1", "R_2", "R_{f1}", "R_{f2}", "CI(95%) R","CI(95%), R_r"))
 legend("topright", legend=legend_str,
        lty=c(rep("solid",4), "dashed", "dotdash", "dotted"),
@@ -253,6 +253,7 @@ cols2plot_l = gsub(x=cols2plot_l, pattern="_([^\\.]*)", repl="_{\\1}")
 cols2plot_l = gsub(x=cols2plot_l, pattern="\\.", repl=" vs. ")
 cols2plot_l = gsub(x=cols2plot_l, pattern="N", repl="R")
 
+axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c(cols2plot_l, "p_{thresh} = 0.05",  paste0("$\\Delta t$ | p < p_{thresh}")))
 legend("topright", legend=legend_str, 
        lty=c(rep("solid", ncols2plot), "dashed", "dotted"),
@@ -318,6 +319,7 @@ matplot(R_fine, y= t(collected_min_aggr_time), type="l", log="x",
 
 text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
 
+axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("$\\Delta R$=", paste0(contrasts_coarse, "")))
 legend("topright", legend=legend_str, col=c(NA, 1:length(contrasts_coarse)), lty=1, lwd=2)
 savePlot2(filename =  paste0("A1_CI_R_vs_aggrtime_", scenario,".png"), type = "png")
@@ -376,6 +378,7 @@ matplot(R_fine, y= t(collected_min_aggr_time), type="l", log="x",
 
 text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(collected_min_aggr_time), labels = paste0("\"", scenario, "\""), cex = 1.2)
 
+axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("$\\Delta R$=", paste0(contrasts_coarse, "")))
 legend("topright", legend=legend_str, col=c(NA, 1:length(contrasts_coarse)), lty=1, lwd=2)
 savePlot2(filename = paste0("A2_p_R_vs_aggrtime_", scenario,".png"), type = "png")
@@ -444,8 +447,9 @@ matplot(R_fine, y= t(collected_max_contrast), type="l",
 
 text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
 
+axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("$\\Delta t$=", paste0(delta_ts_coarse, " h")))
-legend("topright", legend=legend_str, 
+legend("topleft", legend=legend_str, 
        col=c(NA, 1:length(delta_ts_coarse)), lty=1, lwd=2, bg = "white")
 savePlot2(filename = paste0("B1_ci_R_vs_contrast_", scenario,".png"), type = "png")
 if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
@@ -508,7 +512,7 @@ matplot(R_fine, y= t(collected_min_contrast), type="l",
 
 text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
 
-
+axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("$\\Delta t$=", paste0(delta_ts_coarse, " h")))
 legend("topright", legend=legend_str, col=c(NA, 1:length(delta_ts_coarse)), lty=1, lwd=2)
 savePlot2(filename = paste0("B2_p_R_vs_contrast_", scenario,".png"), type = "png")
@@ -568,17 +572,19 @@ if (save_plots) x11()
 par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
 options(scipen=5) #prevent scientific notation in log-scale of plot
 ylims = c(0.5*min(contrasts_coarse), 2*max(contrasts_coarse))
+xlims = c(min(delta_ts_fine2), 1.5*max(delta_ts_fine2))
 matplot(delta_ts_fine2, y= t(collected_max_contrast), type="l",
         xlab=TeX("aggregation time  $\\Delta t$ [h]"),
         ylab=TeX("max contrast $ $ $\\Delta R$ [-]"),
         
         col=1:length(R_coarse), lty=1, lwd=2, log="xy",
+        xlim=xlims,
         ylim=ylims
         #, main=scenario
 )
 
 text(x = exp(mean(log(range(delta_ts_fine2)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
-
+axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("R_1 [counts/h]=", paste0(R_coarse, "")))
 legend("bottomright", legend=legend_str, 
        col=c(NA, 1:length(R_coarse)), lty=1, lwd=2, bg = "white")
@@ -645,8 +651,9 @@ matplot(delta_ts_fine, y= t(collected_min_contrast), type="l",
 
 text(x = exp(mean(log(range(delta_ts_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
 
+axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("R_1 [counts/h]=", paste0(R_coarse, "")))
-legend("topright", legend=legend_str, 
+legend("bottomleft", legend=legend_str, 
        col=c(NA, 1:length(R_coarse)), lty=1, lwd=2, bg = "white")
 savePlot2(filename = paste0("C2_p_aggrtime_vs_contrast_", scenario,".png"), type = "png")
 if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
