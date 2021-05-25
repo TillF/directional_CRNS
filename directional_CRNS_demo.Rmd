@@ -159,7 +159,7 @@ ylims[2] = max(ylims[2], max (R)) #accommodate largest rate in plot
 #ylims = c(1800, 2500)
 
 plot(1, type="n",
-     ylim=ylims, xlim=range(delta_ts_fine), ylab = "count rate R [counts/h]", xlab=expression(paste("aggregation interval ", Delta, "t [h] ")), log="x")
+     ylim=ylims, xlim=range(delta_ts_fine), ylab = TeX("count rate R \\[counts h^{-1}\\]"), xlab=expression(paste("aggregation interval ", Delta, "t [h] ")), log="x")
 
 #plot counts
 abline(h= R[  1:4 ], col=1:4, lty=1, lwd=2) #the "_t" rates
@@ -190,7 +190,8 @@ ci_range = apply(ci_lohi[, cols2plot,], MAR=c(1,2), diff)
 ref_cols = sub(cols2plot, pattern = "(\\d)r_", repl="\\1_") #the columns containing the respective count rates
 
 within_precision = t(t(ci_range) / R[ref_cols]) <= precision #check, where the CI is smaller than the chosen precision
-min_delta_t = apply(within_precision, MAR=2, FUN=function(x){min(which(x))}) #get indices to times when error falls below threshold
+min.which = function(x){ifelse(any(x), min(which(x)), NA)}
+min_delta_t = apply(within_precision, MAR=2, FUN=min.which) #get indices to times when error falls below threshold
 for (i in 1:ncols2plot) #plot lines denoting minimum aggregation interval
 {  
   xplot = delta_ts_fine[min_delta_t[i]] #find position of x-axis where to plot the line
@@ -312,8 +313,8 @@ ylims=c(1,100)
 options(scipen=5) #prevent scientific notation in log-scale of plot
 matplot(R_fine, y= t(collected_min_aggr_time), type="l", log="x",
         ylim=ylims,
-        xlab=TeX("lower countrate R_{1,total} [counts/h]"), 
-        ylab=TeX("minimum aggregation time  $\\Delta t_{min}^{determ}$ [h]"),
+        xlab=TeX("lower countrate R_{1,total} \\[counts h^{-1}\\]"), 
+        ylab=TeX("minimum aggregation time  $\\Delta t_{min}^{determ}$ \\[h\\]"),
         #main=scenario,
         col=1:4, lty=1, lwd=2)
 
@@ -370,8 +371,8 @@ palette(brewer.pal(n=nrow(collected_min_aggr_time), "Dark2")) #construct palette
 if (save_plots) x11()
 par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
 matplot(R_fine, y= t(collected_min_aggr_time), type="l", log="x",
-        xlab=TeX("lower countrate R_{1,total} [counts/h]"), 
-        ylab=TeX("minimum aggregation time $ $ $ \\Delta t_{min}^{disting}$ [h]"),
+        xlab=TeX("lower countrate R_{1,total} \\[counts h^{-1}\\]"), 
+        ylab=TeX("minimum aggregation time $ $ $ \\Delta t_{min}^{disting}$ \\[h\\]"),
         #        main=scenario,
         col=1:4, lty=1, lwd=2)
 
@@ -438,8 +439,8 @@ options(scipen=5) #prevent scientific notation in log-scale of plot
 ylims=c(0, 2*max(contrasts_coarse))
 
 matplot(R_fine, y= t(collected_max_contrast), type="l",
-        xlab=TeX("lower countrate R_{1,epi} [counts/h]"), 
-        ylab=TeX("max contrast $ $ $\\Delta R$ [-]"),
+        xlab=TeX("lower countrate R_{1,epi} \\[counts h^{-1}\\]"), 
+        ylab=TeX("max contrast $ $ $\\Delta R$ \\[-\\]"),
         col=1:length(delta_ts_coarse), lty=1, lwd=2, log="x",
         ylim=ylims
         #, main=scenario
@@ -503,7 +504,7 @@ if (save_plots) x11()
 par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
 ylims = c(0, 0.5*max(contrasts_coarse))
 matplot(R_fine, y= t(collected_min_contrast), type="l",
-        xlab=TeX("lower countrate R_{1} [counts/h]"), 
+        xlab=TeX("lower countrate R_{1} \\[counts h^{-1}\\]"), 
         ylab=TeX("min contrast $ $ $\\Delta R$ [-]"),
         col=1:length(delta_ts_coarse), lty=1, lwd=2 , log="x",
         ylim=ylims
@@ -574,8 +575,8 @@ options(scipen=5) #prevent scientific notation in log-scale of plot
 ylims = c(0.5*min(contrasts_coarse), 2*max(contrasts_coarse))
 xlims = c(min(delta_ts_fine2), 1.5*max(delta_ts_fine2))
 matplot(delta_ts_fine2, y= t(collected_max_contrast), type="l",
-        xlab=TeX("aggregation time  $\\Delta t$ [h]"),
-        ylab=TeX("max contrast $ $ $\\Delta R$ [-]"),
+        xlab=TeX("aggregation time  $\\Delta t$ \\[h\\]"),
+        ylab=TeX("max contrast $ $ $\\Delta R$ \\[-\\]"),
         
         col=1:length(R_coarse), lty=1, lwd=2, log="xy",
         xlim=xlims,
@@ -642,8 +643,8 @@ par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
 options(scipen=5) #prevent scientific notation in log-scale of plot
 ylims = c(1e-3, 0.5*max(contrasts_coarse))
 matplot(delta_ts_fine, y= t(collected_min_contrast), type="l",
-        xlab=TeX("aggregation time  $\\Delta t$ [h]"),
-        ylab=TeX("min contrast $ $ $\\Delta R$ [-]"),
+        xlab=TeX("aggregation time  $\\Delta t$ \\[h\\]"),
+        ylab=TeX("min contrast $ $ $\\Delta R$ \\[-\\]"),
         col=1:length(R_coarse), lty=1, lwd=2, log="xy",
         ylim=ylims
         #, main=scenario
