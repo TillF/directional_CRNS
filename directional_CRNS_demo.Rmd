@@ -12,9 +12,10 @@ by Till Francke, Maik Heistermann, Markus K√∂hli, Christian Budach, Martin Schr√
 This chunk contains the parameters of the simulation, or lets you choose the pre-defined scenarios "optimistic" and "pessimistic".
 
 ```{r, include=FALSE}
+save_plots = FALSE #enable/disable saving PDFs (must be disabled to run in mybinder)                    
 # set the scenario of interest here:
-scenario="optimistic" #"optimistic" or "pessimistic"
-#scenario="pessimistic" #"optimistic" or "pessimistic"
+#scenario="optimistic" #"optimistic" or "pessimistic"
+scenario="pessimistic" #"optimistic" or "pessimistic"
 
 library(latex2exp)
 
@@ -83,7 +84,6 @@ delta_ts_fine = exp(seq(from=log(min(delta_ts_coarse)), to=log(max(delta_ts_coar
 contrasts_coarse = c(.2, .5, .8, 1.4 )
 contrasts_fine = exp(seq(from=log(min(contrasts_coarse)), to=log(max(contrasts_coarse)), length.out=100))  #contrasts to test [-]
 
-save_plots = TRUE #enable/disable saving PDFs (must be disabled to run in mybinder)                    
 
 #wrapper for savePlot to handle saving plots under different circumstances
 savePlot2 = function(...)
@@ -140,10 +140,6 @@ p_value_comp    = res2[, !(dimnames(res2)[[2]] %in% ci_cols)]
 
 if (save_plots) x11()
 par(cex=1.2)
-library(RColorBrewer)
-n = 8
-#construct palette
-palette(brewer.pal(n=n, "Dark2"))
 
 #CI
 #cols2plot  = 1:NCOL(ci_lohi)
@@ -154,12 +150,19 @@ cols2plot =  c("R_1_t", "R_2_t", "R_f1_t", "R_f2_t",  "R_1r_t",  "R_2r_t") #colu
 
 ncols2plot = length(cols2plot)
 
+library(RColorBrewer)
+n = ncols2plot - 2 #the two reconstructed will recycle the colours
+#construct palette
+palette(brewer.pal(n=n, "Dark2"))
+
 ylims = pmax(0, range(ci_lohi[-(1:5), cols2plot,])) #discard the very wide interval in the first three rows
 ylims[2] = max(ylims[2], max (R)) #accommodate largest rate in plot
 #ylims = c(1800, 2500)
 
+xlims = range(delta_ts_fine)
+
 plot(1, type="n",
-     ylim=ylims, xlim=range(delta_ts_fine), ylab = TeX("count rate R \\[counts h^{-1}\\]"), xlab=expression(paste("aggregation interval ", Delta, "t [h] ")), log="x")
+     ylim=ylims, xlim=xlims, ylab = TeX("count rate R \\[counts h^{-1}\\]"), xlab=expression(paste("aggregation interval ", Delta, "t [h] ")), log="x")
 
 #plot counts
 abline(h= R[  1:4 ], col=1:4, lty=1, lwd=2) #the "_t" rates
@@ -194,15 +197,25 @@ min.which = function(x){ifelse(any(x), min(which(x)), NA)}
 min_delta_t = apply(within_precision, MAR=2, FUN=min.which) #get indices to times when error falls below threshold
 for (i in 1:ncols2plot) #plot lines denoting minimum aggregation interval
 {  
+  if(grepl(cols2plot[i], pattern = "\\dr_"))
+     {
+       linecol=transp_cols[i - ncols2plot+2]
+       fillcol= "white"
+     }   else
+     {
+       linecol= org_cols[i]
+       fillcol= linecol
+     }
+             
   xplot = delta_ts_fine[min_delta_t[i]] #find position of x-axis where to plot the line
-  lines(rep(xplot,2),  ci_lohi[min_delta_t[i], cols2plot[i],], col=i) #plot line illustrating the width of the interval
-  lines(rep(xplot,2),  c(ci_lohi[min_delta_t[i], cols2plot[i],"lo"], 0), col=i, lty="dotted")  #plot line pointing down to the x-axis
+  lines(rep(xplot,2),  ci_lohi[min_delta_t[i], cols2plot[i],], col=linecol) #plot line illustrating the width of the interval
+  lines(rep(xplot,2),  c(ci_lohi[min_delta_t[i], cols2plot[i],"lo"], 0), col=linecol, lty="dotted")  #plot line pointing down to the x-axis
   #points(xplot,  R[i], col=i, pch=25, crt=180 ) 
-  points(xplot,  ylims[1], col=i, pch=25, bg=i) #plot marker at x-axis
+  points(xplot,  ylims[1], col=linecol, pch=25, bg=fillcol) #plot marker at x-axis
 }          
 axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("R_1", "R_2", "R_{f1}", "R_{f2}", "CI(95%) R","CI(95%), R_r"))
-legend("topright", legend=legend_str,
+legend(x=xlims[2], y=mean(ylims), xjust=1, legend=legend_str, 
        lty=c(rep("solid",4), "dashed", "dotdash", "dotted"),
        col=c(1:4,rep("black",2)), 
        lwd=c(rep(2,4),rep(1,2)), ncol=1, bg="white")
