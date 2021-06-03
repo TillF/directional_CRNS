@@ -12,7 +12,6 @@ by Till Francke, Maik Heistermann, Markus K√∂hli, Christian Budach, Martin Schr√
 This chunk contains the parameters of the simulation, or lets you choose the pre-defined scenarios "optimistic" and "pessimistic".
 
 ```{r, include=FALSE}
-save_plots = FALSE #enable/disable saving PDFs (must be disabled to run in mybinder)                    
 # set the scenario of interest here:
 #scenario="optimistic" #"optimistic" or "pessimistic"
 scenario="pessimistic" #"optimistic" or "pessimistic"
@@ -63,9 +62,6 @@ k_1 = 2 * beta * (2 * gamma_dir*eta - gamma_dir  - 2*eta + 1)
 k_2=(2 * gamma_dir * eta - gamma_dir- 2 * eta)
 Bi = 1/k_1 * rbind(c(k_2, k_2+2), c(k_2+2, k_2))  #for converting N_total to N_f
 
-#c(2000,3000) %*% A
-#c(2000,3000) %*% B
-
 delta_t = 1 # interval for aggregating the counts [h]
 p_thresh = 0.05 #threshold p-value
 precision = 0.05 #threshold for width of confidence interval of a rate, relative to true rate
@@ -85,12 +81,19 @@ contrasts_coarse = c(.2, .5, .8, 1.4 )
 contrasts_fine = exp(seq(from=log(min(contrasts_coarse)), to=log(max(contrasts_coarse)), length.out=100))  #contrasts to test [-]
 
 
-#wrapper for savePlot to handle saving plots under different circumstances
+#plotting parameters
+save_plots = TRUE #enable/disable saving PDFs (must be disabled to run in mybinder)                    
+linetypes=c(optimistic="solid", pessimistic="dashed") #linetypes for plots
+
+#wrapper for savePlot to handle saving plots differently (when run as notebook OR for producing file output)
 savePlot2 = function(...)
 {
-  if (names(dev.cur())!="RStudioGD" & save_plots) #if this is an RStudio-Plot, don't safe
+  if (names(dev.cur())!="RStudioGD" & save_plots) #if this is an RStudio-Plot, don't save
     savePlot(...)
 }
+
+#create list for displaying both scenarios when run again
+if (!exists("results")) results=list() #create list, if not existing
 
 source("R/compute_ci_p.R")
 
@@ -310,7 +313,8 @@ for (i in 1:length(contrasts_coarse))
   collected_min_aggr_time[i,] = sapply(X=R_fine, FUN=find_min_aggr_time_ci, contrast=contrast, B=B, Bi=Bi, target_sensor="R_1r_t", precision=precision, simplify = TRUE)
 }
 
-
+#store results for displaying both scenarios when run again
+results[["f2_1"]][scenario]=list(collected_min_aggr_time)
 ```
 
 ## 2.1 plot results (fig. 9) ####
@@ -324,18 +328,28 @@ par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
 ylims=c(1,100)
 
 options(scipen=5) #prevent scientific notation in log-scale of plot
-matplot(R_fine, y= t(collected_min_aggr_time), type="l", log="x",
-        ylim=ylims,
-        xlab=TeX("lower countrate R_{1,total} \\[counts h^{-1}\\]"), 
-        ylab=TeX("minimum aggregation time  $\\Delta t_{min}^{determ}$ \\[h\\]"),
-        #main=scenario,
-        col=1:4, lty=1, lwd=2)
-
-text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
+scens2plot = names(results[["f2_1"]]) #get scenarios available in results
+for (scen2plot in scens2plot)
+{
+  collected_min_aggr_time = results[["f2_1"]][[scen2plot]]
+  matplot(R_fine, y= t(collected_min_aggr_time), type="l", log="x",
+          ylim=ylims,
+          xlab=TeX("lower countrate R_{1,total} \\[counts h^{-1}\\]"), 
+          ylab=TeX("minimum aggregation time  $\\Delta t_{min}^{determ}$ \\[h\\]"),
+          #main=scenario,
+          col=1:4, lwd=2,
+          lty=linetypes[scen2plot],
+          add=ifelse(scen2plot == scens2plot[1], FALSE, TRUE))
+}
+  
+#text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
 
 axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("$\\Delta R$=", paste0(contrasts_coarse, "")))
-legend("topright", legend=legend_str, col=c(NA, 1:length(contrasts_coarse)), lty=1, lwd=2)
+legend_str = c(legend_str, scens2plot)
+legend("topright", legend=legend_str, 
+       col=c(NA, palette()[ 1:length(contrasts_coarse)], rep("black", length(scens2plot))),
+       lty=c(NA, rep("solid", length(contrasts_coarse)), linetypes[scens2plot]), lwd=2)
 savePlot2(filename =  paste0("A1_CI_R_vs_aggrtime_", scenario,".png"), type = "png")
 if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("A1_CI_R_vs_aggrtime_", scenario,".pdf"), type = "pdf")
@@ -343,7 +357,7 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
 ```
 Minimum aggregation time $\Delta t_\text{min}^{\text{determ}}$ required to obtain the reconstructed epithermal count rate ${R}_\text{1r,\text{epi}}$ from the two directional measurements with a CI smaller than 5 \% of the actual value. Left: "optimistic" scenario ($\epsilon$ = 0; $\eta$ = 0.72); right:  "pessimistic" scenario ($\epsilon$ = 0.3; $\eta$ = 0.61)
 
-## 2.2 simulate  for a range of settings: R vs. t_min (p-thresh) ####
+## 2.2 simulate for a range of settings: R vs. t_min (p-thresh) ####
 ```{r, echo=FALSE}
 
 # requires functions p_value_two_sided() and compute_ci_p2()
@@ -373,6 +387,8 @@ for (i in 1:length(contrasts_coarse))
   collected_min_aggr_time[i,] = sapply(X=R_fine, FUN=find_min_aggr_time_p, contrast=contrast, B=B, Bi=Bi, target_comparison="N_1r_t.N_2r_t", p_thresh=p_thresh, simplify = TRUE)
 }
 
+#store results for displaying both scenarios when run again
+results[["f2_2"]][scenario]=list(collected_min_aggr_time)
 ```
 
 ## 2.2 plot results (fig. 10) ####
@@ -383,18 +399,29 @@ palette(brewer.pal(n=nrow(collected_min_aggr_time), "Dark2")) #construct palette
 
 if (save_plots) x11()
 par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
-matplot(R_fine, y= t(collected_min_aggr_time), type="l", log="x",
+scens2plot = names(results[["f2_2"]]) #get scenarios available in results
+for (scen2plot in scens2plot)
+{
+  collected_min_aggr_time = results[["f2_2"]][[scen2plot]]
+  matplot(R_fine, y= t(collected_min_aggr_time), type="l", log="x",
         xlab=TeX("lower countrate R_{1,total} \\[counts h^{-1}\\]"), 
         ylab=TeX("minimum aggregation time $ $ $ \\Delta t_{min}^{disting}$ \\[h\\]"),
-        #        main=scenario,
-        col=1:4, lty=1, lwd=2)
+        col=1:4, lwd=2,
+        lty=linetypes[scen2plot],
+        add=ifelse(scen2plot == scens2plot[1], FALSE, TRUE)
+  )
+}        
 
 
-text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(collected_min_aggr_time), labels = paste0("\"", scenario, "\""), cex = 1.2)
+#text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(collected_min_aggr_time), labels = paste0("\"", scenario, "\""), cex = 1.2)
 
 axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("$\\Delta R$=", paste0(contrasts_coarse, "")))
-legend("topright", legend=legend_str, col=c(NA, 1:length(contrasts_coarse)), lty=1, lwd=2)
+legend_str = c(legend_str, scens2plot)
+legend("topright", legend=legend_str, 
+       col=c(NA, palette()[ 1:length(contrasts_coarse)], rep("black", length(scens2plot))),
+       lty=c(NA, rep("solid", length(contrasts_coarse)), linetypes[scens2plot]), lwd=2
+)
 savePlot2(filename = paste0("A2_p_R_vs_aggrtime_", scenario,".png"), type = "png")
 
 if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
@@ -429,15 +456,9 @@ for (i in 1:length(delta_ts_coarse))
   delta_t = delta_ts_coarse[i]
   collected_max_contrast[i,] = sapply(X=R_fine, FUN=find_max_contrast, delta_t=delta_t, B=B, Bi=Bi, target_sensor="R_1r_t", precision=precision, simplify = TRUE)
 }
-# R_1=5000
-# con=0.1
-# #delta_t=9
-# delta_t=6.350596
-# 
-# (con = find_max_contrast(delta_t=delta_t, R_1 = R_1, B=B, Bi=Bi, target_sensor="R_1r_epi", precision=precision)) #test
-# difference_to_threshold_ci(delta_t, R_1, contrast=con,  B,  Bi, target_sensor="R_1r_epi", precision) 
-# compute_ci_p2(delta_t = delta_t, R_1=R_1, R_2=R_1*(1+con), B=B, Bi=Bi)  
 
+#store results for displaying both scenarios when run again
+results[["f3_1"]][scenario]=list(collected_max_contrast)
 ```
 
 ## 3.1 plot results (fig. 11)####
@@ -451,20 +472,30 @@ par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
 options(scipen=5) #prevent scientific notation in log-scale of plot
 ylims=c(0, 2*max(contrasts_coarse))
 
-matplot(R_fine, y= t(collected_max_contrast), type="l",
+scens2plot = names(results[["f3_1"]]) #get scenarios available in results
+for (scen2plot in scens2plot)
+{
+  collected_max_contrast = results[["f3_1"]][[scen2plot]]
+  matplot(R_fine, y= t(collected_max_contrast), type="l",
         xlab=TeX("lower countrate R_{1,epi} \\[counts h^{-1}\\]"), 
         ylab=TeX("max contrast $ $ $\\Delta R$ \\[-\\]"),
-        col=1:length(delta_ts_coarse), lty=1, lwd=2, log="x",
-        ylim=ylims
-        #, main=scenario
+        ylim=ylims,
+        col=1:length(delta_ts_coarse), lwd=2, log="x",
+        lty=linetypes[scen2plot],
+        add=ifelse(scen2plot == scens2plot[1], FALSE, TRUE)
 )
+}        
 
-text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
+#text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
 
 axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("$\\Delta t$=", paste0(delta_ts_coarse, " h")))
+legend_str = c(legend_str, scens2plot)
 legend("topleft", legend=legend_str, 
-       col=c(NA, 1:length(delta_ts_coarse)), lty=1, lwd=2, bg = "white")
+       col=c(NA, palette()[ 1:length(delta_ts_coarse)], rep("black", length(scens2plot))),
+       bg = "white",
+       lty=c(NA, rep("solid", length(delta_ts_coarse)), linetypes[scens2plot]), lwd=2
+)
 savePlot2(filename = paste0("B1_ci_R_vs_contrast_", scenario,".png"), type = "png")
 if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("B1_ci_R_vs_contrast_", scenario,".pdf"), type = "pdf")
@@ -502,6 +533,8 @@ for (i in 1:length(delta_ts_coarse))
   delta_t = delta_ts_coarse[i]
   collected_min_contrast[i,] = sapply(X=R_fine, FUN=find_min_contrast, delta_t=delta_t, B=B, Bi=Bi, target_comparison="N_1r_t.N_2r_t", p_thresh=p_thresh, simplify = TRUE)
 }
+#store results for displaying both scenarios when run again
+results[["f3_2"]][scenario]=list(collected_min_contrast)
 
 #find_min_contrast (R_1, delta_t,  B,  Bi, target_comparison="N_1r_t.N_2r_t", p_thresh) 
 
@@ -516,19 +549,29 @@ palette(brewer.pal(n=nrow(collected_min_contrast), "Paired")) #construct palette
 if (save_plots) x11()
 par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
 ylims = c(0, 0.5*max(contrasts_coarse))
-matplot(R_fine, y= t(collected_min_contrast), type="l",
+scens2plot = names(results[["f3_2"]]) #get scenarios available in results
+for (scen2plot in scens2plot)
+{
+  collected_min_contrast = results[["f3_2"]][[scen2plot]]
+  matplot(R_fine, y= t(collected_min_contrast), type="l",
         xlab=TeX("lower countrate R_{1} \\[counts h^{-1}\\]"), 
         ylab=TeX("min contrast $ $ $\\Delta R$ [-]"),
-        col=1:length(delta_ts_coarse), lty=1, lwd=2 , log="x",
-        ylim=ylims
-        #, main=scenario
-)
+        col=1:length(delta_ts_coarse), lwd=2 , log="x",
+        ylim=ylims,
+        lty=linetypes[scen2plot],
+        add=ifelse(scen2plot == scens2plot[1], FALSE, TRUE)
+        )
+}
 
-text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
+#text(x = exp(mean(log(range(R_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
 
 axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("$\\Delta t$=", paste0(delta_ts_coarse, " h")))
-legend("topright", legend=legend_str, col=c(NA, 1:length(delta_ts_coarse)), lty=1, lwd=2)
+legend_str = c(legend_str, scens2plot)
+legend("topright", legend=legend_str, 
+       col=c(NA, palette()[ 1:length(delta_ts_coarse)], rep("black", length(scens2plot))),
+       lty=c(NA, rep("solid", length(delta_ts_coarse)), linetypes[scens2plot]), lwd=2
+       )
 savePlot2(filename = paste0("B2_p_R_vs_contrast_", scenario,".png"), type = "png")
 if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("B2_p_R_vs_contrast_", scenario,".pdf"), type = "pdf")
@@ -574,6 +617,9 @@ for (i in 1:length(R_coarse))
   collected_max_contrast[i,] = sapply(X=delta_ts_fine2, FUN=find_max_contrast, R_1=R_1, B=B, Bi=Bi, target_sensor="R_1r_t", precision=precision, simplify = TRUE)
 }
 
+#store results for displaying both scenarios when run again
+results[["f4_1"]][scenario]=list(collected_max_contrast)
+
 ```
 
 ## 4.1 plot results (fig. 13)####
@@ -587,21 +633,30 @@ par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
 options(scipen=5) #prevent scientific notation in log-scale of plot
 ylims = c(0.5*min(contrasts_coarse), 2*max(contrasts_coarse))
 xlims = c(min(delta_ts_fine2), 1.5*max(delta_ts_fine2))
-matplot(delta_ts_fine2, y= t(collected_max_contrast), type="l",
+
+scens2plot = names(results[["f4_1"]]) #get scenarios available in results
+for (scen2plot in scens2plot)
+{
+  collected_max_contrast = results[["f4_1"]][[scen2plot]]
+  matplot(delta_ts_fine2, y= t(collected_max_contrast), type="l",
         xlab=TeX("aggregation time  $\\Delta t$ \\[h\\]"),
         ylab=TeX("max contrast $ $ $\\Delta R$ \\[-\\]"),
-        
-        col=1:length(R_coarse), lty=1, lwd=2, log="xy",
+        col=1:length(R_coarse), lwd=2, log="xy",
         xlim=xlims,
-        ylim=ylims
-        #, main=scenario
-)
+        ylim=ylims,
+        lty=linetypes[scen2plot],
+        add=ifelse(scen2plot == scens2plot[1], FALSE, TRUE)
+  )
+}
 
-text(x = exp(mean(log(range(delta_ts_fine2)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
+#text(x = exp(mean(log(range(delta_ts_fine2)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
 axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("R_1 [counts/h]=", paste0(R_coarse, "")))
+legend_str = c(legend_str, scens2plot)
 legend("bottomright", legend=legend_str, 
-       col=c(NA, 1:length(R_coarse)), lty=1, lwd=2, bg = "white")
+       col=c(NA, palette()[ 1:length(R_coarse)], rep("black", length(scens2plot))),
+       lty=c(NA, rep("solid", length(R_coarse)), linetypes[scens2plot]), 
+       lwd=2, bg = "white")
 
 savePlot2(filename = paste0("C1_ci_aggrtime_vs_contrast_", scenario,".png"), type = "png")
 if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
@@ -631,6 +686,9 @@ for (i in 1:length(R_coarse))
   collected_min_contrast[i,] = sapply(X=delta_ts_fine, FUN=find_min_contrast, R_1=R_1, B=B, Bi=Bi, target_comparison="N_1r_t.N_2r_t", p_thresh=p_thresh, simplify = TRUE)
 }
 
+#store results for displaying both scenarios when run again
+results[["f4_2"]][scenario]=list(collected_min_contrast)
+
 
 #find_min_contrast(delta_ts_fine[i], R_1=R_1, B=B, Bi=Bi, target_comparison="N_1r_t.N_2r_t", p_thresh=p_thresh)
 
@@ -655,20 +713,30 @@ if (save_plots) x11()
 par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
 options(scipen=5) #prevent scientific notation in log-scale of plot
 ylims = c(1e-3, 0.5*max(contrasts_coarse))
-matplot(delta_ts_fine, y= t(collected_min_contrast), type="l",
+
+scens2plot = names(results[["f4_2"]]) #get scenarios available in results
+for (scen2plot in scens2plot)
+{
+  collected_min_contrast = results[["f4_2"]][[scen2plot]]
+  matplot(delta_ts_fine, y= t(collected_min_contrast), type="l",
         xlab=TeX("aggregation time  $\\Delta t$ \\[h\\]"),
         ylab=TeX("min contrast $ $ $\\Delta R$ \\[-\\]"),
-        col=1:length(R_coarse), lty=1, lwd=2, log="xy",
-        ylim=ylims
-        #, main=scenario
+        ylim=ylims,
+        col=1:length(R_coarse), lwd=2, log="xy",
+        lty=linetypes[scen2plot],
+        add=ifelse(scen2plot == scens2plot[1], FALSE, TRUE)
 )
+}
 
-text(x = exp(mean(log(range(delta_ts_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
+#text(x = exp(mean(log(range(delta_ts_fine)))), y=0.9 * max(ylims), labels = paste0("\"", scenario, "\""), cex = 1.2)
 
 axis(side=4, labels=FALSE)
 legend_str = sapply(FUN = TeX, X =  c("R_1 [counts/h]=", paste0(R_coarse, "")))
+legend_str = c(legend_str, scens2plot)
 legend("bottomleft", legend=legend_str, 
-       col=c(NA, 1:length(R_coarse)), lty=1, lwd=2, bg = "white")
+              col=c(NA, palette()[ 1:length(R_coarse)], rep("black", length(scens2plot))),
+       lty=c(NA, rep("solid", length(R_coarse)), linetypes[scens2plot]), 
+       lwd=2, bg = "white")
 savePlot2(filename = paste0("C2_p_aggrtime_vs_contrast_", scenario,".png"), type = "png")
 if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("C2_p_aggrtime_vs_contrast_", scenario,".pdf"), type = "pdf")  
@@ -678,4 +746,4 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
 # /home/till/.local/bin/jupytext --to notebook directional_CRNS_demo.Rmd
 
 ```
-Minimum contrast $\Delta {R}$ required to statistically separate the  count rates  ${R}_\text{1r}$ and ${R}_\text{2r}$ reconstructed from the two directional measurements with a p-value < 0.05.
+Minimum contrast $\Delta {R}$ required to statistically separate the count rates  ${R}_\text{1r}$ and ${R}_\text{2r}$ reconstructed from the two directional measurements with a p-value < 0.05.

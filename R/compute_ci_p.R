@@ -71,7 +71,7 @@
     s_1r_t = tt[1]
     s_2r_t = tt[2]
     
-    #for the (virtual) epithermal rates, this error is just scaled proportionally (probably not necessary anyway) 
+    #for the (virtual) epithermal rates, this error is just scaled proportionally (probably not used anyway) 
     s_1r_epi = sqrt((1-gamma_no) * s_1r_t^2)
     s_2r_epi = sqrt((1-gamma_no) * s_2r_t^2)
     
