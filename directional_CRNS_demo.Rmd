@@ -83,7 +83,7 @@ contrasts_fine = exp(seq(from=log(min(contrasts_coarse)), to=log(max(contrasts_c
 
 
 #plotting parameters
-save_plots = TRUE #enable/disable saving PDFs (must be disabled to run in mybinder)                    
+save_plots = FALSE #enable/disable saving PDFs (must be disabled to run in mybinder)                    
 linetypes=c(bestcase="solid", worstcase="dashed") #linetypes for plots
 
 #wrapper for savePlot to handle saving plots differently (when run as notebook OR for producing file output)
