@@ -9,12 +9,12 @@ Scripts for generating the figures of the manuscript
 by Till Francke, Maik Heistermann, Markus Köhli, Christian Budach, Martin Schrön, Sascha E. Oswald
 
 ## 0. parameters ####
-This chunk contains the parameters of the simulation, or lets you choose the pre-defined scenarios "optimistic" and "pessimistic".
+This chunk contains the parameters of the simulation, or lets you choose the pre-defined scenarios "bestcase" and "worstcase".
 
 ```{r, include=FALSE}
 # set the scenario of interest here:
-#scenario="optimistic" #"optimistic" or "pessimistic"
-scenario="pessimistic" #"optimistic" or "pessimistic"
+#scenario="bestcase" #"bestcase" or "worstcase"
+scenario="worstcase" #"bestcase" or "worstcase"
 
 library(latex2exp)
 
@@ -25,19 +25,19 @@ contrast = 0.2  #relative difference in countrate in area_2 [-] #for example fig
 R_2 = R_1 * (1+contrast)
 
 
-if (scenario == "optimistic")
+if (scenario == "bestcase")
 {
-  # snr = 2.63 #optimistic detector #signal-noise-ratio of targeted to untargeted area (from Markus' simulations)
-  eps = 0.1 #optimistic ## fraction of non-epithermal neutrons in counts (=noise)
+  # snr = 2.63 #bestcase detector #signal-noise-ratio of targeted to untargeted area (from Markus' simulations)
+  eps = 0.1 #bestcase ## fraction of non-epithermal neutrons in counts (=noise)
   gamma_dir = 0.2 #fraction of non-albedo counts in the directional signal
   eta = 0.72 #collimation efficiency
   beta = 0.4 #fraction of total counts after installing the collimator
   
 } else
-  if (scenario == "pessimistic")
+  if (scenario == "worstcase")
   {
     #snr = 1.57 #actual detector #signal-noise-ratio of targeted to untargeted area (from Markus' simulations)
-    eps = 0.3 #pessimistic # fraction of non-epithermal neutrons in counts (=noise)
+    eps = 0.3 #worstcase # fraction of non-epithermal neutrons in counts (=noise)
     gamma_dir = 0.31 #fraction of non-albedo counts in the directional signal
     eta = 0.61 #collimation efficiency
     beta = 0.3 #fraction of total counts after installing the collimator
@@ -70,7 +70,8 @@ precision = 0.05 #threshold for width of confidence interval of a rate, relative
 #selection of ranges in plots
 
 #count rates to analyse
-R_coarse = c(450, 2100, 8000, 39000, 144000)
+#R_coarse = c(450, 2100, 8000, 39000, 144000)
+R_coarse = c(500, 2000, 8000, 40000, 150000) #Martin's suggestion
 R_fine   = exp(seq(from=log(min(R_coarse)), to = log(max(R_coarse)), length.out = 100))
 
 #aggregation intervals rates to analyse
@@ -83,7 +84,7 @@ contrasts_fine = exp(seq(from=log(min(contrasts_coarse)), to=log(max(contrasts_c
 
 #plotting parameters
 save_plots = TRUE #enable/disable saving PDFs (must be disabled to run in mybinder)                    
-linetypes=c(optimistic="solid", pessimistic="dashed") #linetypes for plots
+linetypes=c(bestcase="solid", worstcase="dashed") #linetypes for plots
 
 #wrapper for savePlot to handle saving plots differently (when run as notebook OR for producing file output)
 savePlot2 = function(...)
@@ -137,6 +138,7 @@ p_value_comp    = res2[, !(dimnames(res2)[[2]] %in% ci_cols)]
 #str(res2)
 
 ```
+This chunk does the computations for the following two plots.
 
 ## 1.1 plot counts and CIs (fig. 7 / ci_example) ####
 ```{r, echo=FALSE}
@@ -173,10 +175,11 @@ abline(h= R[  1:4 ], col=1:4, lty=1, lwd=2) #the "_t" rates
 
 
 lwd = 1
-lty = ifelse(grepl(cols2plot, pattern = "\\dr_"), "dotted", "dotdash")
+#lty = ifelse(grepl(cols2plot, pattern = "\\dr_"), "dotted", "dotdash")
+lty = "dashed"
 
 matplot(delta_ts_fine, y= ci_lohi[, cols2plot,"hi"], type="l", add = TRUE,
-        col=1:(ncols2plot-2),lty=lty, lwd=lwd)
+        col=1:(ncols2plot-2), lty=lty, lwd=lwd)
 matplot(delta_ts_fine, y= ci_lohi[, cols2plot,"lo"], type="l", add = TRUE,
         col=1:(ncols2plot-2), lty=lty, lwd=lwd)
 
@@ -203,7 +206,7 @@ for (i in 1:ncols2plot) #plot lines denoting minimum aggregation interval
   if(grepl(cols2plot[i], pattern = "\\dr_"))
      {
        linecol=transp_cols[i - ncols2plot+2]
-       fillcol= "white"
+       fillcol= linecol
      }   else
      {
        linecol= org_cols[i]
@@ -217,11 +220,15 @@ for (i in 1:ncols2plot) #plot lines denoting minimum aggregation interval
   points(xplot,  ylims[1], col=linecol, pch=25, bg=fillcol) #plot marker at x-axis
 }          
 axis(side=4, labels=FALSE)
-legend_str = sapply(FUN = TeX, X =  c("R_1", "R_2", "R_{f1}", "R_{f2}", "CI(95%) R","CI(95%), R_r"))
-legend(x=xlims[2], y=mean(ylims), xjust=1, legend=legend_str, 
-       lty=c(rep("solid",4), "dashed", "dotdash", "dotted"),
-       col=c(1:4,rep("black",2)), 
-       lwd=c(rep(2,4),rep(1,2)), ncol=1, bg="white")
+legend_str = sapply(FUN = TeX, X =  c("R_1", "R_2", "R_{f1}", "R_{f2}", "R_{r1}", "R_{r2}", "CI(95%)"))
+legend(x=xlims[2], y=c(0.45, 0.55) %*% ylims, xjust=1, legend=legend_str, 
+       lty=c(rep("solid",6), "dashed"),
+       pch=c(rep(25,6),NA),
+       col=c(org_cols[1:4], transp_cols[1:2], "black"), 
+       pt.bg = c(org_cols[1:4], transp_cols[1:2], "black"), 
+       lwd=c(rep(2,6), 1), ncol=1, bg="white")
+
+
 
 savePlot2(filename = paste0("ci_examp_", scenario,".png"), type = "png")
 
@@ -229,7 +236,7 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("ci_examp_", scenario,".pdf"), type = "pdf")
 
 ```
-Example for 95 \%-confidence intervals for the count rates obtained within the half-spaces (${R}_\text{1,total}$ = 2100 counts/h, ${R}_\text{2,total}$ = 2520 counts/h, "optimistic scenario", moderate contrast $\Delta R=0.2$), by the directional CRNS-sensors (${R}_\text{f1,total}$, ${R}_\text{f2,total}$) and the rates reconstructed from the directional sensors (${R}_\text{1r,total}$, ${R}_\text{2r, total}$). The vertical arrows indicate the minimum required aggregation time to confine the CI within 5 \% of the true value ($\Delta t_\text{min}^{\text{determ}}$).
+Example for 95 \%-confidence intervals for the count rates obtained within the half-spaces (${R}_\text{1,total}$ = 2100 counts/h, ${R}_\text{2,total}$ = 2520 counts/h, "bestcase scenario", moderate contrast $\Delta R=0.2$), by the directional CRNS-sensors (${R}_\text{f1,total}$, ${R}_\text{f2,total}$) and the rates reconstructed from the directional sensors (${R}_\text{1r,total}$, ${R}_\text{2r, total}$). The vertical arrows indicate the minimum required aggregation time to confine the CI within 5 \% of the true value ($\Delta t_\text{min}^{\text{determ}}$).
 
 ## 1.2 p-values of comparison (fig. 8 / p_example)####
 ```{r, echo=FALSE}
@@ -283,7 +290,7 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("p_value_examp_", scenario,".pdf"), type = "pdf")
 
 ```
-p-values for discriminating pairs of measured count rates (${R}_\text {1,total}$ = 2100 counts/h, ${R}_\text {2,total}$ = 2520  counts/h, "optimistic scenario", moderate contrast $\Delta R=0.2$). The vertical arrows indicate the minimum required aggregation time $\Delta t_\text{min}^{\text{disting}}$ to statistically \emph{distinguish} two rates at p = 0.05.
+p-values for discriminating pairs of measured count rates (${R}_\text {1,total}$ = 2100 counts/h, ${R}_\text {2,total}$ = 2520  counts/h, "bestcase scenario", moderate contrast $\Delta R=0.2$). The vertical arrows indicate the minimum required aggregation time $\Delta t_\text{min}^{\text{disting}}$ to statistically \emph{distinguish} two rates at p = 0.05.
 
 # Simulations for a range of settings 
 ## 2.1 simulate  for a range of settings: R vs. t_min (CI-thresh) ####
@@ -322,9 +329,12 @@ results[["f2_1"]][scenario]=list(collected_min_aggr_time)
 
 library(RColorBrewer)
 palette(brewer.pal(n=nrow(collected_min_aggr_time), "Dark2")) #construct palette
+# if (save_plots) x11(width=8, height=4)
+# par(mar=par("mar") + c(0, 0.5,-3,0), cex=1.2, oma=c(0,0,0,0))
 if (save_plots) x11()
-par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
-#ylims=c(0, max(collected_min_aggr_time))
+par(mar=par("mar") + c(0, 0.5, 0,0), cex=1.2)
+
+
 ylims=c(1,100)
 
 options(scipen=5) #prevent scientific notation in log-scale of plot
@@ -335,7 +345,7 @@ for (scen2plot in scens2plot)
   matplot(R_fine, y= t(collected_min_aggr_time), type="l", log="x",
           ylim=ylims,
           xlab=TeX("lower countrate R_{1,total} \\[counts h^{-1}\\]"), 
-          ylab=TeX("minimum aggregation time  $\\Delta t_{min}^{determ}$ \\[h\\]"),
+          ylab=TeX("min. aggreg. time  $\\Delta t_{min}^{determ}$ \\[h\\]"),
           #main=scenario,
           col=1:4, lwd=2,
           lty=linetypes[scen2plot],
@@ -355,7 +365,7 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("A1_CI_R_vs_aggrtime_", scenario,".pdf"), type = "pdf")
 
 ```
-Minimum aggregation time $\Delta t_\text{min}^{\text{determ}}$ required to obtain the reconstructed epithermal count rate ${R}_\text{1r,\text{epi}}$ from the two directional measurements with a CI smaller than 5 \% of the actual value. Left: "optimistic" scenario ($\epsilon$ = 0; $\eta$ = 0.72); right:  "pessimistic" scenario ($\epsilon$ = 0.3; $\eta$ = 0.61)
+Minimum aggregation time $\Delta t_\text{min}^{\text{determ}}$ required to obtain the reconstructed count rate ${R}_\text{1r}$ from the two directional measurements with a CI smaller than 5 \% of the actual value.
 
 ## 2.2 simulate for a range of settings: R vs. t_min (p-thresh) ####
 ```{r, echo=FALSE}
@@ -397,15 +407,18 @@ results[["f2_2"]][scenario]=list(collected_min_aggr_time)
 library(RColorBrewer)
 palette(brewer.pal(n=nrow(collected_min_aggr_time), "Dark2")) #construct palette
 
+# if (save_plots) x11(width=8, height=4)
+# par(mar=par("mar") + c(0, 0.5,-3,0), cex=1.2, oma=c(0,0,0,0))
 if (save_plots) x11()
 par(mar=par("mar") + c(0, 0.5,0,0), cex=1.2)
+
 scens2plot = names(results[["f2_2"]]) #get scenarios available in results
 for (scen2plot in scens2plot)
 {
   collected_min_aggr_time = results[["f2_2"]][[scen2plot]]
   matplot(R_fine, y= t(collected_min_aggr_time), type="l", log="x",
         xlab=TeX("lower countrate R_{1,total} \\[counts h^{-1}\\]"), 
-        ylab=TeX("minimum aggregation time $ $ $ \\Delta t_{min}^{disting}$ \\[h\\]"),
+        ylab=TeX("min. aggreg. time $ $ $ \\Delta t_{min}^{disting}$ \\[h\\]"),
         col=1:4, lwd=2,
         lty=linetypes[scen2plot],
         add=ifelse(scen2plot == scens2plot[1], FALSE, TRUE)
@@ -501,7 +514,7 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("B1_ci_R_vs_contrast_", scenario,".pdf"), type = "pdf")
 
 ```
-Maximum possible contrast $\Delta_R$ in reconstructing the count rates ${R}_\text{1r}$ from the two directional measurements with a CI smaller than 5 \% of the true value.
+Maximum possible contrast $\Delta R$ in reconstructing the count rates ${R}_\text{1r}$ from the two directional measurements with a CI smaller than 5 \% of the true value.
 
 ## 3.2 simulate  for a range of settings: R vs. contrasts (p-thresh) ####
 ```{r, echo=FALSE}
@@ -578,7 +591,7 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
 
 
 ```
-Minimum contrast $\Delta_R$ required to statistically separate the reconstructed count rates  ${R}_\text{1r}$ and ${R}_\text{2r}$ from the two directional measurements with p-value < 0.05.
+Minimum contrast $\Delta R$ required to statistically separate the reconstructed count rates  ${R}_\text{1r}$ and ${R}_\text{2r}$ from the two directional measurements with p-value < 0.05.
 
 ## 4.1 simulate  for a range of settings: aggr_time vs. contrasts (CI-thresh) ####
 ```{r, echo=FALSE}
@@ -663,7 +676,7 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("C1_ci_aggrtime_vs_contrast_", scenario,".pdf"), type = "pdf")
 
 ```
-Maximum possible contrast $\Delta_R$ to allow the reconstruction of the count rate ${R}_\text{1r}$ from the two directional measurements with a CI smaller than 5 \% of the true value with the aggregation time $\Delta t$.
+Maximum possible contrast $\Delta R$ to allow the reconstruction of the count rate ${R}_\text{1r}$ from the two directional measurements with a CI smaller than 5 \% of the true value with the aggregation time $\Delta t$.
 
 ## 4.2 simulate  for a range of settings: R vs. contrasts (p-thresh) ####
 ```{r, echo=FALSE}
