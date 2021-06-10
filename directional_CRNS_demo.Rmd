@@ -13,8 +13,8 @@ This chunk contains the parameters of the simulation, or lets you choose the pre
 
 ```{r, include=FALSE}
 # set the scenario of interest here:
-#scenario="bestcase" #"bestcase" or "worstcase"
-scenario="worstcase" #"bestcase" or "worstcase"
+scenario="bestcase" #"bestcase" or "worstcase"
+#scenario="worstcase" #"bestcase" or "worstcase"
 
 library(latex2exp)
 
@@ -755,7 +755,7 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("C2_p_aggrtime_vs_contrast_", scenario,".pdf"), type = "pdf")  
 
 # convert this Rmd to ipynb by one of these
-# /home/till/.local/bin/notedown directional_CRNS_demo.Rmd --knit > directional_CRNS_demo2.ipynb
+# /home/till/.local/bin/notedown directional_CRNS_demo.Rmd --knit > directional_CRNS_demo.ipynb
 # /home/till/.local/bin/jupytext --to notebook directional_CRNS_demo.Rmd
 
 ```
