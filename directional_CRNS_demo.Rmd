@@ -4,17 +4,17 @@ output: html_notebook
 ---
 
 # Illustrate theoretical discernability and accuracy of CRNS signal of a directional CRNS probe
-Scripts for generating the figures of the manuscript
-"Assessing the feasibility of a directional CRNS-sensor for estimating soil moisture"
-by Till Francke, Maik Heistermann, Markus Köhli, Christian Budach, Martin Schrön, Sascha E. Oswald
+# Scripts for generating the figures of the scientific article
+# "Assessing the feasibility of a directional CRNS-sensor for estimating soil moisture"
+# by Till Francke, Maik Heistermann, Markus Köhli, Christian Budach, Martin Schrön, Sascha E. Oswald (2021), https://doi.org/10.5194/gi-2021-18
 
 ## 0. parameters ####
-This chunk contains the parameters of the simulation, or lets you choose the pre-defined scenarios "bestcase" and "worstcase".
+This chunk contains the parameters of the simulation, or lets you choose the pre-defined scenarios "favourable" and "unfavourable".
 
 ```{r, include=FALSE}
 # set the scenario of interest here:
-scenario="bestcase" #"bestcase" or "worstcase"
-#scenario="worstcase" #"bestcase" or "worstcase"
+#scenario="favourable" #"favourable" or "unfavourable"
+scenario="unfavourable" #"favourable" or "unfavourable"
 
 library(latex2exp)
 
@@ -25,19 +25,19 @@ contrast = 0.2  #relative difference in countrate in area_2 [-] #for example fig
 R_2 = R_1 * (1+contrast)
 
 
-if (scenario == "bestcase")
+if (scenario == "favourable")
 {
-  # snr = 2.63 #bestcase detector #signal-noise-ratio of targeted to untargeted area (from Markus' simulations)
-  eps = 0.1 #bestcase ## fraction of non-epithermal neutrons in counts (=noise)
+  # snr = 2.63 #favourable detector #signal-noise-ratio of targeted to untargeted area (from Markus' simulations)
+  eps = 0.1 #favourable ## fraction of non-epithermal neutrons in counts (=noise)
   gamma_dir = 0.2 #fraction of non-albedo counts in the directional signal
   eta = 0.72 #collimation efficiency
   beta = 0.4 #fraction of total counts after installing the collimator
   
 } else
-  if (scenario == "worstcase")
+  if (scenario == "unfavourable")
   {
     #snr = 1.57 #actual detector #signal-noise-ratio of targeted to untargeted area (from Markus' simulations)
-    eps = 0.3 #worstcase # fraction of non-epithermal neutrons in counts (=noise)
+    eps = 0.3 #unfavourable # fraction of non-epithermal neutrons in counts (=noise)
     gamma_dir = 0.31 #fraction of non-albedo counts in the directional signal
     eta = 0.61 #collimation efficiency
     beta = 0.3 #fraction of total counts after installing the collimator
@@ -84,7 +84,7 @@ contrasts_fine = exp(seq(from=log(min(contrasts_coarse)), to=log(max(contrasts_c
 
 #plotting parameters
 save_plots = FALSE #enable/disable saving PDFs (must be disabled to run in mybinder)                    
-linetypes=c(bestcase="solid", worstcase="dashed") #linetypes for plots
+linetypes=c(favourable="solid", unfavourable="dashed") #linetypes for plots
 
 #wrapper for savePlot to handle saving plots differently (when run as notebook OR for producing file output)
 savePlot2 = function(...)
@@ -236,7 +236,7 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("ci_examp_", scenario,".pdf"), type = "pdf")
 
 ```
-Example for 95 \%-confidence intervals for the count rates obtained within the half-spaces (${R}_\text{1,total}$ = 2100 counts/h, ${R}_\text{2,total}$ = 2520 counts/h, "bestcase scenario", moderate contrast $\Delta R=0.2$), by the directional CRNS-sensors (${R}_\text{f1,total}$, ${R}_\text{f2,total}$) and the rates reconstructed from the directional sensors (${R}_\text{1r,total}$, ${R}_\text{2r, total}$). The vertical arrows indicate the minimum required aggregation time to confine the CI within 5 \% of the true value ($\Delta t_\text{min}^{\text{determ}}$).
+Example for 95 \%-confidence intervals for the count rates obtained within the half-spaces (${R}_\text{1,total}$ = 2100 counts/h, ${R}_\text{2,total}$ = 2520 counts/h, "favourable scenario", moderate contrast $\Delta R=0.2$), by the directional CRNS-sensors (${R}_\text{f1,total}$, ${R}_\text{f2,total}$) and the rates reconstructed from the directional sensors (${R}_\text{1r,total}$, ${R}_\text{2r, total}$). The vertical arrows indicate the minimum required aggregation time to confine the CI within 5 \% of the true value ($\Delta t_\text{min}^{\text{determ}}$).
 
 ## 1.2 p-values of comparison (fig. 8 / p_example)####
 ```{r, echo=FALSE}
@@ -290,7 +290,7 @@ if (Sys.info()["sysname"]=="Windows") #pdf-export only works in Windows
   savePlot2(filename = paste0("p_value_examp_", scenario,".pdf"), type = "pdf")
 
 ```
-p-values for discriminating pairs of measured count rates (${R}_\text {1,total}$ = 2100 counts/h, ${R}_\text {2,total}$ = 2520  counts/h, "bestcase scenario", moderate contrast $\Delta R=0.2$). The vertical arrows indicate the minimum required aggregation time $\Delta t_\text{min}^{\text{disting}}$ to statistically \emph{distinguish} two rates at p = 0.05.
+p-values for discriminating pairs of measured count rates (${R}_\text {1,total}$ = 2100 counts/h, ${R}_\text {2,total}$ = 2520  counts/h, "favourable scenario", moderate contrast $\Delta R=0.2$). The vertical arrows indicate the minimum required aggregation time $\Delta t_\text{min}^{\text{disting}}$ to statistically \emph{distinguish} two rates at p = 0.05.
 
 # Simulations for a range of settings 
 ## 2.1 simulate  for a range of settings: R vs. t_min (CI-thresh) ####
